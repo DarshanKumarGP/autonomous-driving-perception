@@ -1,0 +1,9 @@
+group,n_images,n_boxes,mAP50,mAP50-95,recall
+time: dawn/dusk,69,1292,0.438,0.244,0.377
+time: daytime,439,8571,0.476,0.256,0.427
+time: night,289,4837,0.384,0.203,0.363
+weather: clear,420,7296,0.411,0.22,0.367
+weather: overcast,105,2103,0.468,0.252,0.431
+weather: partly cloudy,58,1181,0.401,0.233,0.358
+weather: rainy,51,802,0.386,0.222,0.377
+weather: snowy,63,1148,0.46,0.252,0.459
