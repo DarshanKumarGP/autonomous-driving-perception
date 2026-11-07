@@ -1,0 +1,15 @@
+venv/
+.venv/
+__pycache__/
+*.pyc
+.env
+*.pt
+*.pth
+*.onnx
+*.engine
+*.zip
+data/
+runs/
+wandb/
+outputs/
+.ipynb_checkpoints/
