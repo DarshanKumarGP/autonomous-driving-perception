@@ -1,0 +1,94 @@
+{
+ "frames": 140,
+ "objects": 611,
+ "sizes": {
+  "256": {
+   "metrics": {
+    "n": 611,
+    "mae_m": 37.73,
+    "median_abs_rel_err_pct": 58.4,
+    "within25_pct": 17.2,
+    "bias_m": 27.85
+   },
+   "pair_order_acc_pct": 85.1,
+   "pairs": 1428,
+   "ms_per_frame": 15.5
+  },
+  "512": {
+   "metrics": {
+    "n": 611,
+    "mae_m": 12.56,
+    "median_abs_rel_err_pct": 24.4,
+    "within25_pct": 45.0,
+    "bias_m": 8.06
+   },
+   "pair_order_acc_pct": 95.4,
+   "pairs": 1428,
+   "ms_per_frame": 17.1
+  },
+  "768": {
+   "metrics": {
+    "n": 611,
+    "mae_m": 16.69,
+    "median_abs_rel_err_pct": 26.1,
+    "within25_pct": 41.2,
+    "bias_m": 12.37
+   },
+   "pair_order_acc_pct": 95.0,
+   "pairs": 1428,
+   "ms_per_frame": 18.8
+  }
+ },
+ "baseline_always_median": {
+  "n": 611,
+  "mae_m": 11.53,
+  "median_abs_rel_err_pct": 40.2,
+  "within25_pct": 24.4,
+  "bias_m": -2.63
+ },
+ "baseline_ground_plane_assumed_kitti_calibration": {
+  "n": 611,
+  "mae_m": 4.89,
+  "median_abs_rel_err_pct": 13.0,
+  "within25_pct": 73.3,
+  "bias_m": -2.34
+ },
+ "best_size": 512,
+ "by_distance_bin": {
+  "3-15 m": {
+   "n": 169,
+   "mae_m": 2.2,
+   "median_abs_rel_err_pct": 16.0,
+   "within25_pct": 63.9,
+   "bias_m": 0.03
+  },
+  "15-30 m": {
+   "n": 222,
+   "mae_m": 7.56,
+   "median_abs_rel_err_pct": 24.6,
+   "within25_pct": 45.9,
+   "bias_m": 3.24
+  },
+  "30-50 m": {
+   "n": 183,
+   "mae_m": 23.72,
+   "median_abs_rel_err_pct": 35.3,
+   "within25_pct": 31.7,
+   "bias_m": 17.91
+  },
+  "50-80 m": {
+   "n": 37,
+   "mae_m": 34.61,
+   "median_abs_rel_err_pct": 46.8,
+   "within25_pct": 18.9,
+   "bias_m": 24.98
+  }
+ },
+ "fit_on_all_frames": {
+  "size": 512,
+  "s": 4197.254595791953,
+  "t": 29.50832616089814,
+  "note": "depth_value = s*(1/Z) + t; valid only for KITTI-like cameras"
+ },
+ "notes": "GT 2D boxes used, not detections; 140 frames; sizes compared on the same data; ground-plane baseline uses assumed typical KITTI calibration; KITTI licence terms unconfirmed"
+}
