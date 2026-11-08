@@ -1,0 +1,18 @@
+{
+ "clip2": {
+  "frames": 288,
+  "seconds": 12.0,
+  "unique_tracks": 33,
+  "pipeline_ms_per_frame_t4": 60.4,
+  "pipeline_fps_t4": 16.6,
+  "note": "YOLO11s + ByteTrack + MiDaS_small(512) + drawing, excludes video decode/encode; no ground truth for these clips"
+ },
+ "clip4": {
+  "frames": 287,
+  "seconds": 12.0,
+  "unique_tracks": 9,
+  "pipeline_ms_per_frame_t4": 53.0,
+  "pipeline_fps_t4": 18.9,
+  "note": "YOLO11s + ByteTrack + MiDaS_small(512) + drawing, excludes video decode/encode; no ground truth for these clips"
+ }
+}
