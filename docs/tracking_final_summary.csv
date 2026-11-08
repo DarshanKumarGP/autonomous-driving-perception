@@ -1,0 +1,4 @@
+clip,config,seconds,frames,unique_ids,median_len,pct_under_5
+clip2,B conf0.35 vehicles+people,20.0,480,57,5,47
+clip4,B conf0.35 vehicles+people,20.0,479,8,27,38
+clip5,B conf0.35 vehicles+people,8.9,213,79,4,52
