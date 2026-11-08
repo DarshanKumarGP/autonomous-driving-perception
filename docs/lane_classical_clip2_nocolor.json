@@ -1,0 +1,23 @@
+{
+  "video": "clip2.mp4",
+  "frames": 480,
+  "seconds_of_video": 20.0,
+  "left_found_pct": 69.0,
+  "right_found_pct": 85.0,
+  "both_found_pct_raw": 55.2,
+  "both_shown_pct_after_smoothing": 82.9,
+  "processing_fps_incl_decode": 18.5,
+  "params": {
+    "max_seconds": 20,
+    "width": 960,
+    "top": 0.5,
+    "bottom": 0.97,
+    "top_half_width": 0.12,
+    "bottom_half_width": 0.5,
+    "hough_threshold": 30,
+    "alpha": 0.25,
+    "hold": 8,
+    "no_color": true
+  },
+  "note": "No ground truth: percentages count how often a lane line was found, not accuracy."
+}
