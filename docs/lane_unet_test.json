@@ -1,0 +1,13 @@
+{
+ "test_images": 410,
+ "best_val_iou": 0.6395,
+ "test_iou": 0.5844,
+ "test_dice": 0.7377,
+ "tol4px_precision": 0.96,
+ "tol4px_recall": 0.8435,
+ "tol4px_f1": 0.898,
+ "model_ms_per_image_t4_fp32_batch1": 15.8,
+ "input": "640x352",
+ "encoder_init": "imagenet",
+ "note": "tolerance 4 px at 640x352 (about 8 px at 1280x720); split by drive; one highway dataset"
+}

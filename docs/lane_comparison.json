@@ -1,0 +1,39 @@
+{
+ "test_frames": 410,
+ "classical_config": {
+  "top": 0.45,
+  "top_half_width": 0.12,
+  "hough_threshold": 20,
+  "bottom": 0.98,
+  "bottom_half_width": 0.5
+ },
+ "classical_chosen_on": "validation drive 0531 by full-frame F1",
+ "full_frame": {
+  "classical": {
+   "precision": 0.968,
+   "recall": 0.319,
+   "f1": 0.48
+  },
+  "segmentation": {
+   "precision": 0.96,
+   "recall": 0.843,
+   "f1": 0.898
+  }
+ },
+ "inside_classical_region": {
+  "classical": {
+   "precision": 0.968,
+   "recall": 0.75,
+   "f1": 0.846
+  },
+  "segmentation": {
+   "precision": 0.982,
+   "recall": 0.983,
+   "f1": 0.982
+  }
+ },
+ "classical_both_lines_found_pct": 82.7,
+ "classical_ms_per_frame_colab_cpu": 4.8,
+ "segmentation_ms_per_frame_t4": 15.8,
+ "note": "4 px tolerance at 640x352; one highway dataset; classical outputs only the two lines around the ego lane"
+}
