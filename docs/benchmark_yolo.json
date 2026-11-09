@@ -1,0 +1,101 @@
+{
+ "environment": {
+  "torch": "2.14.1+cu130",
+  "ultralytics": "8.4.208",
+  "tensorrt": "11.4.0.106",
+  "onnxruntime": "1.30.0",
+  "gpu": "Tesla T4",
+  "ort_providers": [
+   "TensorrtExecutionProvider",
+   "CUDAExecutionProvider",
+   "CPUExecutionProvider"
+  ]
+ },
+ "rows": [
+  {
+   "label": "PyTorch FP32 (GPU)",
+   "images_timed": 200,
+   "model_ms_median": 9.42,
+   "model_ms_p95": 16.33,
+   "total_ms_median": 13.34,
+   "total_fps": 74.9,
+   "size_mb": 19.2,
+   "test_mAP50": 0.4136,
+   "test_mAP50_95": 0.2196,
+   "precision": 0.7026,
+   "recall": 0.3814,
+   "source": "first run"
+  },
+  {
+   "label": "PyTorch FP16 (GPU)",
+   "images_timed": 200,
+   "model_ms_median": 9.7,
+   "model_ms_p95": 12.83,
+   "total_ms_median": 13.49,
+   "total_fps": 74.1,
+   "size_mb": 19.2,
+   "test_mAP50": 0.4135,
+   "test_mAP50_95": 0.2194,
+   "precision": 0.697,
+   "recall": 0.3816,
+   "source": "first run"
+  },
+  {
+   "label": "TensorRT FP16 (GPU)",
+   "images_timed": 200,
+   "model_ms_median": 2.5,
+   "model_ms_p95": 5.0,
+   "total_ms_median": 5.52,
+   "total_fps": 181.0,
+   "size_mb": 96.2,
+   "test_mAP50": 0.4114,
+   "test_mAP50_95": 0.2172,
+   "precision": 0.6869,
+   "recall": 0.3836,
+   "source": "second run"
+  },
+  {
+   "label": "ONNX Runtime (CPU)",
+   "images_timed": 40,
+   "model_ms_median": 284.68,
+   "model_ms_p95": 433.35,
+   "total_ms_median": 289.32,
+   "total_fps": 3.5,
+   "size_mb": 37.9,
+   "onnx_providers_used": [
+    "CPUExecutionProvider"
+   ],
+   "test_mAP50": 0.4124,
+   "test_mAP50_95": 0.2174,
+   "precision": 0.6882,
+   "recall": 0.3836,
+   "source": "second run"
+  },
+  {
+   "label": "PyTorch FP32 (CPU)",
+   "images_timed": 40,
+   "model_ms_median": 167.58,
+   "model_ms_p95": 245.98,
+   "total_ms_median": 171.72,
+   "total_fps": 5.8,
+   "size_mb": 19.2,
+   "source": "second run"
+  },
+  {
+   "label": "ONNX Runtime (GPU)",
+   "images_timed": 200,
+   "model_ms_median": 8.47,
+   "model_ms_p95": 9.95,
+   "total_ms_median": 11.34,
+   "total_fps": 88.2,
+   "size_mb": 37.9,
+   "onnx_providers_used": [
+    "CUDAExecutionProvider",
+    "CPUExecutionProvider"
+   ],
+   "source": "second run"
+  }
+ ],
+ "errors": {},
+ "notes": "first two rows come from the first run in the same VM; same 220 test images, batch 1, 640 px, warm-up 15 images; CPU rows use 40 images on Colab CPU (not the laptop); engine built on and valid for this T4 only; total time includes pre/post-processing; test-split mAP on a 800-image subset"
+}
