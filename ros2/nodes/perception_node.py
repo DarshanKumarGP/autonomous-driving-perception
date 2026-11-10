@@ -11,10 +11,10 @@ import numpy as np
 import rclpy
 from rclpy.node import Node
 from rclpy.qos import HistoryPolicy, QoSProfile, ReliabilityPolicy
-from sensor_msgs.msg import Image
+from sensor_msgs.msg import CompressedImage, Image
 from std_msgs.msg import String
 
-from common import frame_to_msg, msg_to_frame
+from common import msg_to_frame
 from iou_tracker import IouTracker
 from onnx_yolo import NAMES, OnnxYolo
 from warning_logic import DEFAULT_CORRIDOR, assess
@@ -40,12 +40,12 @@ class PerceptionNode(Node):
         qos = QoSProfile(history=HistoryPolicy.KEEP_LAST, depth=2, reliability=ReliabilityPolicy.RELIABLE)
         qos10 = QoSProfile(history=HistoryPolicy.KEEP_LAST, depth=10, reliability=ReliabilityPolicy.RELIABLE)
         self.create_subscription(Image, "/camera/image_raw", self.on_image, qos)
-        self.pub_img = self.create_publisher(Image, "/perception/annotated", qos10)
+        self.pub_img = self.create_publisher(CompressedImage, "/perception/annotated/compressed", qos10)
         self.pub_det = self.create_publisher(String, "/perception/detections", qos10)
         self.pub_warn = self.create_publisher(String, "/perception/warning", qos10)
         self.pub_status = self.create_publisher(String, "/perception/status", qos10)
         self.n, self.t_pipe, self.t_model, self.t_cb = 0, [], [], []
-        self.t_rx, self.t_render, self.t_pub = [], [], []
+        self.t_rx, self.t_render, self.t_enc, self.t_pub = [], [], [], []
         self.level_frames, self.first_level, self.id_cls = {0: 0, 1: 0, 2: 0}, {1: None, 2: None}, {}
         self.finish_time, self.done = None, False
         self.beat()
@@ -88,6 +88,23 @@ class PerceptionNode(Node):
                     cv2.FONT_HERSHEY_SIMPLEX, 0.55, (255, 255, 255), 1)
         return out
 
+    def publish_jpeg(self, out, stamp, fid):
+        ok, buf = cv2.imencode(".jpg", out, [cv2.IMWRITE_JPEG_QUALITY, 90])
+        t_enc = time.perf_counter()
+        if not ok:
+            return t_enc
+        cm = CompressedImage()
+        cm.header.stamp = stamp
+        cm.header.frame_id = fid
+        cm.format = "jpeg"
+        flat = buf.reshape(-1)
+        try:
+            cm.data = flat
+        except (AssertionError, TypeError):
+            cm.data = flat.tobytes()
+        self.pub_img.publish(cm)
+        return t_enc
+
     def on_image(self, msg):
         t0 = time.perf_counter()
         frame = msg_to_frame(msg)
@@ -112,10 +129,11 @@ class PerceptionNode(Node):
         t1 = time.perf_counter()
         out = self.render(frame, tracks, level, culprit, ms_pipe)
         t2 = time.perf_counter()
-        self.pub_img.publish(frame_to_msg(out, msg.header.stamp, fid))
-        t3 = time.perf_counter()
+        t_enc = self.publish_jpeg(out, msg.header.stamp, fid)
+        t4 = time.perf_counter()
         self.t_render.append((t2 - t1) * 1000)
-        self.t_pub.append((t3 - t2) * 1000)
+        self.t_enc.append((t_enc - t2) * 1000)
+        self.t_pub.append((t4 - t_enc) * 1000)
         payload = dict(frame=idx, level=level, culprit=culprit, ms=round(ms_pipe, 1),
                        tracks=[dict(id=t["id"], cls=NAMES[t["cls"]], score=round(t["score"], 2),
                                     box=[int(round(v)) for v in t["box"]]) for t in tracks])
@@ -126,7 +144,7 @@ class PerceptionNode(Node):
         self.log.flush()
         self.t_cb.append((time.perf_counter() - t0) * 1000)
         if self.n % 10 == 0:
-            self.get_logger().info('progress: %d frames processed, last callback %.0f ms' % (self.n, self.t_cb[-1]))
+            self.get_logger().info("progress: %d frames processed, last callback %.0f ms" % (self.n, self.t_cb[-1]))
         if last:
             self.finish(idx)
 
@@ -140,14 +158,16 @@ class PerceptionNode(Node):
                      frames_dropped=max(0, published - self.n),
                      receive_ms_median=med(self.t_rx), model_ms_median=med(self.t_model),
                      pipeline_ms_median=med(self.t_pipe), pipeline_ms_p95=round(float(np.percentile(self.t_pipe, 95)), 1),
-                     render_ms_median=med(self.t_render), publish_annotated_ms_median=med(self.t_pub),
-                     callback_ms_median=med(self.t_cb), callback_fps=round(1000.0 / float(np.median(self.t_cb)), 1),
+                     render_ms_median=med(self.t_render), jpeg_encode_ms_median=med(self.t_enc),
+                     publish_annotated_ms_median=med(self.t_pub),
+                     callback_ms_median=med(self.t_cb), callback_p95_ms=round(float(np.percentile(self.t_cb, 95)), 1),
+                     callback_fps=round(1000.0 / float(np.median(self.t_cb)), 1),
                      frames_by_warning_level={"clear": self.level_frames[0], "caution": self.level_frames[1],
                                               "brake": self.level_frames[2]},
                      first_caution_frame=self.first_level[1], first_brake_frame=self.first_level[2],
                      confirmed_tracks_by_class=per_class,
                      note="pipeline = receive + letterbox + ONNX model + NMS + tracking + warning rule; callback also includes drawing, "
-                          "publishing and logging; IoU tracker (not ByteTrack); warning thresholds are uncalibrated heuristics")
+                          "JPEG encoding, publishing and logging; IoU tracker (not ByteTrack); warning thresholds are uncalibrated heuristics")
         with open("%s/%s_stats.json" % (self.out_dir, self.name), "w") as f:
             json.dump(stats, f, indent=1)
         self.get_logger().info("perception finished: " + json.dumps(stats))
@@ -170,4 +190,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

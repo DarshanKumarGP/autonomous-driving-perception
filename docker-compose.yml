@@ -5,9 +5,9 @@ services:
       dockerfile: ros2/Dockerfile
     image: adp-ros2-pipeline:0.1
     environment:
-      - VIDEO=/data/demo720.mp4
-      - RUN_NAME=demo
-      - PUBLISH_HZ=4.0
+      - VIDEO=${VIDEO:-/data/demo720.mp4}
+      - RUN_NAME=${RUN_NAME:-demo}
+      - PUBLISH_HZ=${PUBLISH_HZ:-4.0}
       - MAX_SECONDS=20
     volumes:
       - ./models:/models:ro
@@ -22,3 +22,5 @@ services:
       timeout: 5s
       retries: 3
       start_period: 90s
+
+

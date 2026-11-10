@@ -1,0 +1,28 @@
+{
+ "run": "demo",
+ "frames_published": 80,
+ "frames_processed": 80,
+ "frames_dropped": 0,
+ "receive_ms_median": 0.0,
+ "model_ms_median": 191.1,
+ "pipeline_ms_median": 194.1,
+ "pipeline_ms_p95": 309.8,
+ "render_ms_median": 0.6,
+ "jpeg_encode_ms_median": 10.5,
+ "publish_annotated_ms_median": 14.6,
+ "callback_ms_median": 222.7,
+ "callback_p95_ms": 349.9,
+ "callback_fps": 4.5,
+ "frames_by_warning_level": {
+  "clear": 80,
+  "caution": 0,
+  "brake": 0
+ },
+ "first_caution_frame": null,
+ "first_brake_frame": null,
+ "confirmed_tracks_by_class": {
+  "car": 19,
+  "truck": 2
+ },
+ "note": "pipeline = receive + letterbox + ONNX model + NMS + tracking + warning rule; callback also includes drawing, JPEG encoding, publishing and logging; IoU tracker (not ByteTrack); warning thresholds are uncalibrated heuristics"
+}

@@ -1,14 +1,13 @@
-"""ROS2 node: writes /perception/annotated to an mp4 file."""
+"""ROS2 node: decodes /perception/annotated/compressed (JPEG) and writes it to an mp4 file."""
 import os
 
 import cv2
+import numpy as np
 import rclpy
 from rclpy.node import Node
 from rclpy.qos import HistoryPolicy, QoSProfile, ReliabilityPolicy
-from sensor_msgs.msg import Image
+from sensor_msgs.msg import CompressedImage
 from std_msgs.msg import String
-
-from common import msg_to_frame
 
 
 class RecorderNode(Node):
@@ -24,14 +23,18 @@ class RecorderNode(Node):
         self.writer, self.n, self.done = None, 0, False
         self.path = "%s/%s_annotated.mp4" % (self.out_dir, self.name)
         qos10 = QoSProfile(history=HistoryPolicy.KEEP_LAST, depth=10, reliability=ReliabilityPolicy.RELIABLE)
-        self.create_subscription(Image, "/perception/annotated", self.on_img, qos10)
+        self.create_subscription(CompressedImage, "/perception/annotated/compressed", self.on_img, qos10)
         self.create_subscription(String, "/perception/status", self.on_status, qos10)
         self.get_logger().info("recorder: writing %s at %.1f fps" % (self.path, self.fps))
 
     def on_img(self, m):
-        f = msg_to_frame(m)
+        f = cv2.imdecode(np.frombuffer(m.data, dtype=np.uint8), cv2.IMREAD_COLOR)
+        if f is None:
+            self.get_logger().warn("could not decode a frame")
+            return
         if self.writer is None:
-            self.writer = cv2.VideoWriter(self.path, cv2.VideoWriter_fourcc(*"mp4v"), self.fps, (m.width, m.height))
+            h, w = f.shape[:2]
+            self.writer = cv2.VideoWriter(self.path, cv2.VideoWriter_fourcc(*"mp4v"), self.fps, (w, h))
         self.writer.write(f)
         self.n += 1
 
