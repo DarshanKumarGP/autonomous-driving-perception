@@ -1,0 +1,24 @@
+services:
+  ros2-pipeline:
+    build:
+      context: .
+      dockerfile: ros2/Dockerfile
+    image: adp-ros2-pipeline:0.1
+    environment:
+      - VIDEO=/data/demo720.mp4
+      - RUN_NAME=demo
+      - PUBLISH_HZ=4.0
+      - MAX_SECONDS=20
+    volumes:
+      - ./models:/models:ro
+      - ./data/videos:/data:ro
+      - ./outputs/ros2:/out
+    mem_limit: 3g
+    shm_size: 256m
+    restart: "no"
+    healthcheck:
+      test: ["CMD-SHELL", "test $$(( $$(date +%s) - $$(stat -c %Y /tmp/heartbeat) )) -lt 30"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 90s

@@ -1,0 +1,12 @@
+venv
+.git
+data
+outputs
+models
+notebooks
+assets
+docs
+*.onnx
+*.engine
+*.pt
+__pycache__
