@@ -11,7 +11,11 @@ def frame_to_msg(frame_bgr, stamp, frame_id):
     m.encoding = "bgr8"
     m.is_bigendian = 0
     m.step = m.width * 3
-    m.data = frame_bgr.tobytes()
+    flat = np.ascontiguousarray(frame_bgr, dtype=np.uint8).reshape(-1)
+    try:
+        m.data = flat                      # fast path: numpy uint8 array
+    except (AssertionError, TypeError):
+        m.data = flat.tobytes()            # fallback
     return m
 
 

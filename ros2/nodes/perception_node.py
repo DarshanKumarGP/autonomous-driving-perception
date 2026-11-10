@@ -45,6 +45,7 @@ class PerceptionNode(Node):
         self.pub_warn = self.create_publisher(String, "/perception/warning", qos10)
         self.pub_status = self.create_publisher(String, "/perception/status", qos10)
         self.n, self.t_pipe, self.t_model, self.t_cb = 0, [], [], []
+        self.t_rx, self.t_render, self.t_pub = [], [], []
         self.level_frames, self.first_level, self.id_cls = {0: 0, 1: 0, 2: 0}, {1: None, 2: None}, {}
         self.finish_time, self.done = None, False
         self.beat()
@@ -90,6 +91,7 @@ class PerceptionNode(Node):
     def on_image(self, msg):
         t0 = time.perf_counter()
         frame = msg_to_frame(msg)
+        rx_ms = (time.perf_counter() - t0) * 1000
         fid = msg.header.frame_id
         idx = int(re.sub(r"\D", "", fid) or 0)
         last = fid.startswith("last")
@@ -101,13 +103,19 @@ class PerceptionNode(Node):
         self.n += 1
         self.t_pipe.append(ms_pipe)
         self.t_model.append(self.det.last_infer_ms)
+        self.t_rx.append(rx_ms)
         self.level_frames[level] += 1
         if level and self.first_level[level] is None:
             self.first_level[level] = idx
         for t in tracks:
             self.id_cls[t["id"]] = NAMES[t["cls"]]
+        t1 = time.perf_counter()
         out = self.render(frame, tracks, level, culprit, ms_pipe)
+        t2 = time.perf_counter()
         self.pub_img.publish(frame_to_msg(out, msg.header.stamp, fid))
+        t3 = time.perf_counter()
+        self.t_render.append((t2 - t1) * 1000)
+        self.t_pub.append((t3 - t2) * 1000)
         payload = dict(frame=idx, level=level, culprit=culprit, ms=round(ms_pipe, 1),
                        tracks=[dict(id=t["id"], cls=NAMES[t["cls"]], score=round(t["score"], 2),
                                     box=[int(round(v)) for v in t["box"]]) for t in tracks])
@@ -117,6 +125,8 @@ class PerceptionNode(Node):
         self.log.write(text + "\n")
         self.log.flush()
         self.t_cb.append((time.perf_counter() - t0) * 1000)
+        if self.n % 10 == 0:
+            self.get_logger().info('progress: %d frames processed, last callback %.0f ms' % (self.n, self.t_cb[-1]))
         if last:
             self.finish(idx)
 
@@ -125,19 +135,19 @@ class PerceptionNode(Node):
         per_class = {}
         for c in self.id_cls.values():
             per_class[c] = per_class.get(c, 0) + 1
+        med = lambda v: round(float(np.median(v)), 1)
         stats = dict(run=self.name, frames_published=published, frames_processed=self.n,
                      frames_dropped=max(0, published - self.n),
-                     model_ms_median=round(float(np.median(self.t_model)), 1),
-                     pipeline_ms_median=round(float(np.median(self.t_pipe)), 1),
-                     pipeline_ms_p95=round(float(np.percentile(self.t_pipe, 95)), 1),
-                     callback_ms_median=round(float(np.median(self.t_cb)), 1),
-                     callback_fps=round(1000.0 / float(np.median(self.t_cb)), 1),
+                     receive_ms_median=med(self.t_rx), model_ms_median=med(self.t_model),
+                     pipeline_ms_median=med(self.t_pipe), pipeline_ms_p95=round(float(np.percentile(self.t_pipe, 95)), 1),
+                     render_ms_median=med(self.t_render), publish_annotated_ms_median=med(self.t_pub),
+                     callback_ms_median=med(self.t_cb), callback_fps=round(1000.0 / float(np.median(self.t_cb)), 1),
                      frames_by_warning_level={"clear": self.level_frames[0], "caution": self.level_frames[1],
                                               "brake": self.level_frames[2]},
                      first_caution_frame=self.first_level[1], first_brake_frame=self.first_level[2],
                      confirmed_tracks_by_class=per_class,
-                     note="pipeline = letterbox + ONNX model + NMS + tracking + warning rule; callback also includes drawing and publishing; "
-                          "IoU tracker (not ByteTrack); warning thresholds are uncalibrated heuristics")
+                     note="pipeline = receive + letterbox + ONNX model + NMS + tracking + warning rule; callback also includes drawing, "
+                          "publishing and logging; IoU tracker (not ByteTrack); warning thresholds are uncalibrated heuristics")
         with open("%s/%s_stats.json" % (self.out_dir, self.name), "w") as f:
             json.dump(stats, f, indent=1)
         self.get_logger().info("perception finished: " + json.dumps(stats))
@@ -160,3 +170,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
