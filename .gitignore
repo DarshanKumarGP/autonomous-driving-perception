@@ -13,3 +13,4 @@ runs/
 wandb/
 outputs/
 .ipynb_checkpoints/
+/models

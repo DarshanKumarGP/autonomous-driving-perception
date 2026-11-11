@@ -1,0 +1,4 @@
+# written by scripts/write_requirements.py from the working venv (Python 3.13.5)
+-r requirements.txt
+pytest==9.2.0
+dvc==3.67.1
