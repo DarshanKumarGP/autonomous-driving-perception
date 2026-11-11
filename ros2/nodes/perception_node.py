@@ -78,7 +78,7 @@ class PerceptionNode(Node):
             hot = culprit is not None and t["id"] == culprit[0]
             col = (0, 0, 255) if (hot and level == 2) else ((0, 140, 255) if hot else (0, 220, 0))
             cv2.rectangle(out, (x1, y1), (x2, y2), col, 2)
-            cv2.putText(out, "%s #%d" % (NAMES[t["cls"]], t["id"]), (x1, max(16, y1 - 6)),
+            if (x2 - x1) >= 60 or hot: cv2.putText(out, "%s #%d" % (NAMES[t["cls"]], t["id"]), (x1, max(16, y1 - 6)),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.65, col, 2)
         txt, col = LEVELS[level]
         cv2.rectangle(out, (0, 0), (w, 46), col, -1)
@@ -190,3 +190,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
