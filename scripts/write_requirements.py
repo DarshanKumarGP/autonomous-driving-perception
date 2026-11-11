@@ -3,7 +3,7 @@ import sys
 from importlib import metadata
 
 RUNTIME = ["numpy", "opencv-python", "onnxruntime"]
-DEV = ["pytest", "dvc"]
+DEV = ["pytest", "dvc", "matplotlib"]
 
 
 def pin(names):
@@ -32,4 +32,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
