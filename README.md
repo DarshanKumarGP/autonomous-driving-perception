@@ -43,7 +43,7 @@ A vision pipeline for driving footage: object detection and tracking, lane detec
 - Speed numbers: GPU numbers are for a Tesla T4 on Colab. The TensorRT engine only works on a T4. CPU numbers vary between runs and I do not know why.
 - Research and educational prototype. Not suitable for driving decisions.
 
-More detail: docs/ARCHITECTURE.md and docs/DATA.md.
+More detail: docs/TEST_RESULTS.md, docs/MODEL_CARD.md, docs/ARCHITECTURE.md and docs/DATA.md.
 
 ## Quick start
 
@@ -143,3 +143,4 @@ Lanes, depth and speed:
 ## Related
 
 Project 1 of this internship: https://github.com/DarshanKumarGP/ai-medical-imaging
+
