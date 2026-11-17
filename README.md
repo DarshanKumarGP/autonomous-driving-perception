@@ -102,7 +102,7 @@ docker-compose.yml, requirements.txt, requirements-dev.txt
 - Detector training: https://wandb.ai/darshankumargp/adp-bdd100k
 - Lane model: https://wandb.ai/darshankumargp/adp-lanes
 
-These projects are on the author's account and may not be visible to others. The same curves are exported in assets/training_curves.png, docs/yolo_training_results.csv and docs/lane_unet_history.json.
+These projects are private (the account only allows team visibility), so reviewers cannot open them. The same curves are exported in assets/training_curves.png, docs/yolo_training_results.csv and docs/lane_unet_history.json.
 
 ## Screenshots
 
@@ -143,4 +143,5 @@ Lanes, depth and speed:
 ## Related
 
 Project 1 of this internship: https://github.com/DarshanKumarGP/ai-medical-imaging
+
 
